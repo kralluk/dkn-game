@@ -85,6 +85,7 @@
     .card--combat  { --accent: #ef4444; --glow: rgba(239,68,68,0.15); }
     .card--blackjack { --accent: #f5d060; --glow: rgba(245,208,96,0.12); }
     .card--snake     { --accent: #4ade80; --glow: rgba(74,222,128,0.12); }
+    .card--chess     { --accent: #e2c97e; --glow: rgba(226,201,126,0.12); }
 
     .card:hover { border-color: var(--accent); box-shadow: 0 16px 40px var(--glow); }
 
@@ -197,6 +198,17 @@
       <span class="card__tag">Classic</span>
       <div class="card__title">Snake</div>
       <div class="card__desc">Eat, grow and don't hit the walls. How long can you survive?</div>
+      <div class="card__play">
+        <span>Play</span>
+        <svg viewBox="0 0 16 16"><path d="M3 2l10 6-10 6V2z"/></svg>
+      </div>
+    </a>
+
+    <a class="card card--chess" href="chess/index.html">
+      <span class="card__icon">♟️</span>
+      <span class="card__tag">Strategy</span>
+      <div class="card__title">Chess</div>
+      <div class="card__desc">Play against the AI. Classic rules, full moves — castling, en passant and all.</div>
       <div class="card__play">
         <span>Play</span>
         <svg viewBox="0 0 16 16"><path d="M3 2l10 6-10 6V2z"/></svg>
