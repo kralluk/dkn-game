@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Snake — Jungle</title>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #0a1a08;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      font-family: Georgia, serif;
+      color: #c8e6c0;
+      overflow: hidden;
+      touch-action: none;
+      user-select: none;
+    }
+
+    #hud {
+      display: flex;
+      gap: 32px;
+      margin-bottom: 10px;
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      color: #5a7a52;
+    }
+
+    #hud span { color: #8bc34a; font-weight: bold; }
+
+    canvas {
+      display: block;
+      border-radius: 6px;
+      box-shadow: 0 0 40px rgba(0,0,0,0.8), 0 0 0 2px #1a3a10;
+    }
+
+    /* D-pad */
+    #dpad {
+      display: none;
+      margin-top: 20px;
+      position: relative;
+      width: 150px;
+      height: 150px;
+    }
+
+    .dpad-btn {
+      position: absolute;
+      width: 46px;
+      height: 46px;
+      background: rgba(10,30,8,0.85);
+      border: 1px solid #2d5a20;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      cursor: pointer;
+      color: #6aaa44;
+      -webkit-tap-highlight-color: transparent;
+      transition: background 0.1s, border-color 0.1s;
+    }
+
+    .dpad-btn:active { background: #1a3a10; border-color: #8bc34a; }
+
+    #btn-up    { top: 0;    left: 50%; transform: translateX(-50%); }
+    #btn-down  { bottom: 0; left: 50%; transform: translateX(-50%); }
+    #btn-left  { left: 0;  top: 50%;  transform: translateY(-50%); }
+    #btn-right { right: 0; top: 50%;  transform: translateY(-50%); }
+
+    @media (pointer: coarse) {
+      #dpad { display: block; }
+    }
+
+    #back {
+      margin-top: 18px;
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #2d4a28;
+      text-decoration: none;
+      transition: color 0.2s;
+      font-family: Georgia, serif;
+    }
+    #back:hover { color: #8bc34a; }
+  </style>
+</head>
+<body>
+
+<div id="hud">
+  Score: <span id="score-val">0</span>
+  &nbsp;&nbsp;Best: <span id="best-val">0</span>
+</div>
+
+<canvas id="c"></canvas>
+
+<div id="dpad">
+  <div class="dpad-btn" id="btn-up">▲</div>
+  <div class="dpad-btn" id="btn-left">◀</div>
+  <div class="dpad-btn" id="btn-right">▶</div>
+  <div class="dpad-btn" id="btn-down">▼</div>
+</div>
+
+<a id="back" href="../index.html">← back to menu</a>
+
+<script>
+  const canvas = document.getElementById('c');
+  const ctx = canvas.getContext('2d');
+  const scoreEl = document.getElementById('score-val');
+  const bestEl  = document.getElementById('best-val');
+
+  const CELL = 22;
+  const maxW = Math.min(window.innerWidth - 32, 440);
+  const COLS = Math.floor(maxW / CELL);
+  const ROWS = Math.floor(Math.min(window.innerHeight * 0.56, 440) / CELL);
+  canvas.width  = COLS * CELL;
+  canvas.height = ROWS * CELL;
+
+  let snake, dir, next, food, score, best, state, loop, frameCount = 0;
+  best = +localStorage.getItem('snake-jungle-best') || 0;
+  bestEl.textContent = best;
+
+  // Pregenerate static jungle decoration (leaves, dirt patches)
+  const leaves = [];
+  const dirtPatches = [];
+  for (let i = 0; i < 18; i++) {
+    leaves.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      angle: Math.random() * Math.PI * 2,
+      size: 10 + Math.random() * 18,
+      alpha: 0.06 + Math.random() * 0.1,
+      color: Math.random() > 0.5 ? '#2a5c1a' : '#1a4010'
+    });
+  }
+  for (let i = 0; i < 10; i++) {
+    dirtPatches.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      r: 8 + Math.random() * 20,
+      alpha: 0.04 + Math.random() * 0.06
+    });
+  }
+
+  function rand(max) { return Math.floor(Math.random() * max); }
+
+  function placeFood() {
+    let pos;
+    do { pos = { x: rand(COLS), y: rand(ROWS) }; }
+    while (snake.some(s => s.x === pos.x && s.y === pos.y));
+    food = pos;
+  }
+
+  function init() {
+    const cx = Math.floor(COLS / 2);
+    const cy = Math.floor(ROWS / 2);
+    snake = [{ x: cx, y: cy }, { x: cx - 1, y: cy }, { x: cx - 2, y: cy }];
+    dir  = { x: 1, y: 0 };
+    next = { x: 1, y: 0 };
+    score = 0; frameCount = 0;
+    scoreEl.textContent = 0;
+    state = 'running';
+    placeFood();
+    clearInterval(loop);
+    loop = setInterval(tick, 115);
+  }
+
+  function tick() {
+    frameCount++;
+    dir = { ...next };
+    const head = { x: snake[0].x + dir.x, y: snake[0].y + dir.y };
+    if (head.x < 0 || head.x >= COLS || head.y < 0 || head.y >= ROWS) return gameOver();
+    if (snake.some(s => s.x === head.x && s.y === head.y)) return gameOver();
+    snake.unshift(head);
+    if (head.x === food.x && head.y === food.y) {
+      score++;
+      scoreEl.textContent = score;
+      if (score > best) { best = score; bestEl.textContent = best; localStorage.setItem('snake-jungle-best', best); }
+      placeFood();
+    } else { snake.pop(); }
+    draw();
+  }
+
+  function gameOver() {
+    state = 'dead';
+    clearInterval(loop);
+    draw();
+    drawOverlay();
+  }
+
+  // ─── Drawing helpers ───────────────────────────────────────────
+
+  function drawJungleBackground() {
+    // Base ground gradient — dark jungle soil
+    const bg = ctx.createLinearGradient(0, 0, 0, canvas.height);
+    bg.addColorStop(0, '#0e2209');
+    bg.addColorStop(0.5, '#0b1c07');
+    bg.addColorStop(1, '#071505');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Subtle soil patches
+    dirtPatches.forEach(p => {
+      ctx.save();
+      ctx.globalAlpha = p.alpha;
+      ctx.fillStyle = '#3a2a10';
+      ctx.beginPath();
+      ctx.ellipse(p.x, p.y, p.r * 1.6, p.r, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    });
+
+    // Faint grid lines — like jungle floor tiles, barely visible
+    ctx.strokeStyle = 'rgba(30,60,20,0.18)';
+    ctx.lineWidth = 0.5;
+    for (let x = 0; x <= COLS; x++) {
+      ctx.beginPath(); ctx.moveTo(x * CELL, 0); ctx.lineTo(x * CELL, canvas.height); ctx.stroke();
+    }
+    for (let y = 0; y <= ROWS; y++) {
+      ctx.beginPath(); ctx.moveTo(0, y * CELL); ctx.lineTo(canvas.width, y * CELL); ctx.stroke();
+    }
+
+    // Static leaf silhouettes
+    leaves.forEach(l => {
+      ctx.save();
+      ctx.globalAlpha = l.alpha;
+      ctx.translate(l.x, l.y);
+      ctx.rotate(l.angle);
+      ctx.fillStyle = l.color;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, l.size, l.size * 0.4, 0, 0, Math.PI * 2);
+      ctx.fill();
+      // Leaf vein
+      ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+      ctx.lineWidth = 0.6;
+      ctx.beginPath();
+      ctx.moveTo(-l.size, 0); ctx.lineTo(l.size, 0);
+      ctx.stroke();
+      ctx.restore();
+    });
+
+    // Vignette — dark edges like dense canopy
+    const vig = ctx.createRadialGradient(
+      canvas.width/2, canvas.height/2, canvas.width * 0.2,
+      canvas.width/2, canvas.height/2, canvas.width * 0.85
+    );
+    vig.addColorStop(0, 'rgba(0,0,0,0)');
+    vig.addColorStop(1, 'rgba(0,0,0,0.55)');
+    ctx.fillStyle = vig;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }
+
+  function drawLeaf(cx, cy, angle, size, color1, color2) {
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(angle);
+    const g = ctx.createLinearGradient(-size, 0, size, 0);
+    g.addColorStop(0, color1);
+    g.addColorStop(1, color2);
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.ellipse(0, 0, size, size * 0.45, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // Midrib
+    ctx.strokeStyle = 'rgba(0,0,0,0.25)';
+    ctx.lineWidth = 0.8;
+    ctx.beginPath(); ctx.moveTo(-size * 0.9, 0); ctx.lineTo(size * 0.9, 0); ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawSnakeSegment(seg, i, total, headDir) {
+    const x = seg.x * CELL + CELL / 2;
+    const y = seg.y * CELL + CELL / 2;
+    const isHead = i === 0;
+    const isTail = i === total - 1;
+    const t = i / total;
+
+    // Scale pattern color — anaconda-ish: dark olive/brown with lighter patches
+    const baseG = Math.round(80 - t * 30);
+    const baseR = Math.round(40 + t * 20);
+    const baseB = Math.round(20);
+
+    const bodyColor  = `rgb(${baseR},${baseG},${baseB})`;
+    const scaleLight = `rgb(${baseR + 30},${baseG + 40},${baseB + 10})`;
+    const scaleDark  = `rgb(${baseR - 10},${baseG - 20},${baseB})`;
+
+    const r = (CELL / 2) - (isTail ? 3 : 1);
+
+    ctx.save();
+
+    // Drop shadow per segment
+    ctx.shadowBlur = isHead ? 10 : 4;
+    ctx.shadowColor = 'rgba(0,0,0,0.7)';
+    ctx.shadowOffsetX = 1;
+    ctx.shadowOffsetY = 2;
+
+    // Body segment
+    const grad = ctx.createRadialGradient(x - 2, y - 2, 1, x, y, r);
+    grad.addColorStop(0, scaleLight);
+    grad.addColorStop(0.5, bodyColor);
+    grad.addColorStop(1, scaleDark);
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.shadowBlur = 0; ctx.shadowOffsetX = 0; ctx.shadowOffsetY = 0;
+
+    // Scale detail — oval patches every 2 segments
+    if (!isHead && i % 2 === 0) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.globalAlpha = 0.3;
+      ctx.fillStyle = scaleLight;
+      ctx.beginPath();
+      ctx.ellipse(0, 1, r * 0.5, r * 0.3, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    if (isHead) {
+      // Head shape — slightly larger, more oval in movement direction
+      ctx.save();
+      ctx.translate(x, y);
+      const angle = Math.atan2(headDir.y, headDir.x);
+      ctx.rotate(angle);
+
+      // Head gradient — slightly different shade
+      const hg = ctx.createRadialGradient(-2, -2, 1, 0, 0, r + 2);
+      hg.addColorStop(0, '#7aaa30');
+      hg.addColorStop(0.5, '#4a7a18');
+      hg.addColorStop(1, '#2a4a08');
+      ctx.fillStyle = hg;
+      ctx.shadowBlur = 8; ctx.shadowColor = 'rgba(0,0,0,0.6)';
+      ctx.beginPath();
+      ctx.ellipse(1, 0, r + 2, r, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+
+      // Eyes
+      const eyeOff = r * 0.42;
+      [1, -1].forEach(side => {
+        // Eye white/yellow
+        ctx.fillStyle = '#e8d060';
+        ctx.beginPath();
+        ctx.arc(r * 0.3, side * eyeOff, 2.5, 0, Math.PI * 2);
+        ctx.fill();
+        // Pupil — vertical slit
+        ctx.fillStyle = '#111';
+        ctx.save();
+        ctx.translate(r * 0.3, side * eyeOff);
+        ctx.scale(0.4, 1);
+        ctx.beginPath();
+        ctx.arc(0, 0, 2.2, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      });
+
+      // Tongue
+      const tonguePhase = Math.sin(frameCount * 0.3);
+      if (tonguePhase > 0.2) {
+        ctx.strokeStyle = '#e03060';
+        ctx.lineWidth = 1.2;
+        ctx.lineCap = 'round';
+        const tl = 7 + tonguePhase * 3;
+        ctx.beginPath();
+        ctx.moveTo(r + 1, 0);
+        ctx.lineTo(r + tl, 0);
+        ctx.stroke();
+        // Fork
+        ctx.beginPath();
+        ctx.moveTo(r + tl, 0);
+        ctx.lineTo(r + tl + 3, -2.5);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(r + tl, 0);
+        ctx.lineTo(r + tl + 3, 2.5);
+        ctx.stroke();
+      }
+
+      ctx.restore();
+    }
+
+    ctx.restore();
+  }
+
+  function drawFood() {
+    const fx = food.x * CELL + CELL / 2;
+    const fy = food.y * CELL + CELL / 2;
+    const t = Date.now() / 600;
+    const pulse = 0.85 + 0.15 * Math.sin(t);
+    const fr = (CELL / 2 - 3) * pulse;
+
+    ctx.save();
+
+    // Glow
+    ctx.shadowBlur = 18 * pulse;
+    ctx.shadowColor = 'rgba(220,60,40,0.8)';
+
+    // Fruit body — tropical berry
+    const fg = ctx.createRadialGradient(fx - fr * 0.3, fy - fr * 0.3, fr * 0.1, fx, fy, fr);
+    fg.addColorStop(0, '#ff8060');
+    fg.addColorStop(0.4, '#e03020');
+    fg.addColorStop(1, '#7a0010');
+    ctx.fillStyle = fg;
+    ctx.beginPath();
+    ctx.arc(fx, fy, fr, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.shadowBlur = 0;
+
+    // Shine
+    ctx.globalAlpha = 0.35;
+    ctx.fillStyle = '#fff';
+    ctx.beginPath();
+    ctx.ellipse(fx - fr * 0.25, fy - fr * 0.3, fr * 0.28, fr * 0.18, -0.5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.globalAlpha = 1;
+
+    // Small stem
+    ctx.strokeStyle = '#4a6a20';
+    ctx.lineWidth = 1.5;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(fx, fy - fr);
+    ctx.quadraticCurveTo(fx + 4, fy - fr - 5, fx + 2, fy - fr - 8);
+    ctx.stroke();
+
+    // Tiny leaf on stem
+    ctx.fillStyle = '#5a8a28';
+    ctx.beginPath();
+    ctx.ellipse(fx + 4, fy - fr - 5, 4, 2, 0.8, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.restore();
+  }
+
+  function draw() {
+    drawJungleBackground();
+    drawFood();
+    snake.forEach((seg, i) => drawSnakeSegment(seg, i, snake.length, dir));
+  }
+
+  function drawOverlay() {
+    // Semi-transparent dark jungle fog
+    ctx.fillStyle = 'rgba(5,15,3,0.78)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.textAlign = 'center';
+    const mid = canvas.width / 2;
+    const midy = canvas.height / 2;
+
+    // Decorative leaf corners
+    drawLeaf(30, 30, 0.3, 22, '#1a4010', '#0e2a08');
+    drawLeaf(canvas.width - 30, 30, -0.3, 22, '#1a4010', '#0e2a08');
+    drawLeaf(30, canvas.height - 30, 0.8, 22, '#1a4010', '#0e2a08');
+    drawLeaf(canvas.width - 30, canvas.height - 30, -0.8, 22, '#1a4010', '#0e2a08');
+
+    // Title
+    ctx.fillStyle = '#cc3322';
+    ctx.shadowBlur = 18;
+    ctx.shadowColor = '#aa2211';
+    ctx.font = `bold ${Math.floor(CELL * 1.9)}px Georgia, serif`;
+    ctx.fillText('GAME OVER', mid, midy - CELL * 2.2);
+    ctx.shadowBlur = 0;
+
+    // Divider vine
+    ctx.strokeStyle = '#2d5a1a';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 6]);
+    ctx.beginPath();
+    ctx.moveTo(mid - 80, midy - CELL * 0.8);
+    ctx.lineTo(mid + 80, midy - CELL * 0.8);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    ctx.fillStyle = '#8ab870';
+    ctx.font = `${CELL - 3}px Georgia, serif`;
+    ctx.fillText(`Score: ${score}`, mid, midy + CELL * 0.3);
+    ctx.fillText(`Best:  ${best}`,  mid, midy + CELL * 1.7);
+
+    ctx.fillStyle = Math.floor(Date.now() / 500) % 2 === 0 ? '#c8e6c0' : '#3a5a32';
+    ctx.font = `${CELL - 5}px Georgia, serif`;
+    ctx.fillText('tap or press ENTER', mid, midy + CELL * 3.4);
+    ctx.textAlign = 'left';
+
+    if (state === 'dead') setTimeout(() => { if (state === 'dead') drawOverlay(); }, 500);
+  }
+
+  function drawStart() {
+    drawJungleBackground();
+
+    ctx.textAlign = 'center';
+    const mid = canvas.width / 2;
+    const midy = canvas.height / 2;
+
+    // Decorative leaves
+    drawLeaf(mid - 70, midy - CELL * 2.5, -0.4, 28, '#2a6010', '#163808');
+    drawLeaf(mid + 70, midy - CELL * 2.5,  0.4, 28, '#2a6010', '#163808');
+
+    ctx.fillStyle = '#5aaa28';
+    ctx.shadowBlur = 22;
+    ctx.shadowColor = '#2a6010';
+    ctx.font = `bold ${Math.floor(CELL * 2.4)}px Georgia, serif`;
+    ctx.fillText('SNAKE', mid, midy - CELL * 1.2);
+    ctx.shadowBlur = 0;
+
+    ctx.fillStyle = '#4a7a38';
+    ctx.font = `italic ${CELL - 2}px Georgia, serif`;
+    ctx.fillText('Jungle Edition', mid, midy + CELL * 0.4);
+
+    ctx.fillStyle = '#3a5a30';
+    ctx.font = `${CELL - 5}px Georgia, serif`;
+    ctx.fillText('tap or press ENTER', mid, midy + CELL * 2.2);
+    ctx.textAlign = 'left';
+  }
+
+  // ─── Input ─────────────────────────────────────────────────────
+
+  function setDir(dx, dy) {
+    if (state !== 'running') return;
+    if (dx === -dir.x && dy === -dir.y) return;
+    next = { x: dx, y: dy };
+  }
+
+  document.addEventListener('keydown', e => {
+    switch (e.key) {
+      case 'ArrowUp':    case 'w': case 'W': e.preventDefault(); setDir(0, -1); break;
+      case 'ArrowDown':  case 's': case 'S': e.preventDefault(); setDir(0,  1); break;
+      case 'ArrowLeft':  case 'a': case 'A': e.preventDefault(); setDir(-1, 0); break;
+      case 'ArrowRight': case 'd': case 'D': e.preventDefault(); setDir(1,  0); break;
+      case 'Enter': case ' ': if (state !== 'running') init(); break;
+    }
+  });
+
+  document.getElementById('btn-up').addEventListener('pointerdown',    e => { e.preventDefault(); setDir(0, -1); });
+  document.getElementById('btn-down').addEventListener('pointerdown',  e => { e.preventDefault(); setDir(0,  1); });
+  document.getElementById('btn-left').addEventListener('pointerdown',  e => { e.preventDefault(); setDir(-1, 0); });
+  document.getElementById('btn-right').addEventListener('pointerdown', e => { e.preventDefault(); setDir(1,  0); });
+
+  let touchStartX = 0, touchStartY = 0;
+  canvas.addEventListener('touchstart', e => {
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+  }, { passive: true });
+
+  canvas.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    const dy = e.changedTouches[0].clientY - touchStartY;
+    if (Math.abs(dx) < 10 && Math.abs(dy) < 10) { if (state !== 'running') init(); return; }
+    if (Math.abs(dx) > Math.abs(dy)) setDir(dx > 0 ? 1 : -1, 0);
+    else setDir(0, dy > 0 ? 1 : -1);
+  }, { passive: true });
+
+  state = 'start';
+  drawStart();
+</script>
+</body>
+</html>
