@@ -702,10 +702,10 @@
 </div>
 
 <!-- STRATEGY HINT -->
-<div id="hint-box" onclick="this.classList.toggle('revealed')">
+<div id="hint-box">
   <span id="hint-label">Strategy</span>
   <span id="hint-situation"></span>
-  <span id="hint-reveal-cue">hover / tap to reveal</span>
+  <span id="hint-reveal-cue" onclick="document.getElementById('hint-box').classList.toggle('revealed')">hover / tap to reveal</span>
   <span id="hint-action"></span>
   <span id="hint-feedback"></span>
 </div>
