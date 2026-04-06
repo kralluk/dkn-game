@@ -618,6 +618,99 @@
   .ch-R    { background: #1a1a10; color: #9090a0; }
   .ch-none { background: #0c0c08; color: #333330; }
 
+  /* ── TRAINER ─────────────────────────────────────────────── */
+  .trainer-tabs { display:flex; gap:6px; margin-bottom:14px; justify-content:center; flex-wrap:wrap; }
+  .trainer-tab {
+    background:#141008; border:1px solid #2a2010; color:#6a8050;
+    border-radius:6px; padding:5px 14px; font-size:0.78rem;
+    font-family:Georgia,serif; cursor:pointer; transition:all 0.15s;
+  }
+  .trainer-tab:hover { border-color:#6a5010; color:#c0903a; }
+  .trainer-tab.active { background:#2a1e08; border-color:#d4a843; color:#d4a843; font-weight:bold; }
+
+  .trainer-stats-bar {
+    display:flex; gap:0; margin-bottom:14px;
+    background:#0c0c08; border:1px solid #2a2010;
+    border-radius:8px; overflow:hidden; align-items:center;
+  }
+  .trainer-stat { flex:1; text-align:center; padding:7px 8px; border-right:1px solid #1a1a10; }
+  .trainer-stat:last-of-type { flex:none; padding:0 10px; border-right:none; }
+  .trainer-stat-label { font-size:0.5rem; color:#4a5a38; text-transform:uppercase; letter-spacing:1.5px; display:block; margin-bottom:1px; }
+  .trainer-stat-val { font-size:1.05rem; font-weight:bold; color:#d4a843; text-shadow:0 0 8px rgba(212,168,67,0.3); }
+  .trainer-streak-val { color:#f0c060; }
+  .trainer-reset-btn {
+    padding:4px 9px; background:transparent; border:1px solid #1a1a10;
+    color:#2a3a18; border-radius:5px; font-size:0.52rem; letter-spacing:0.5px;
+    font-family:Georgia,serif; cursor:pointer; transition:all 0.15s; white-space:nowrap;
+  }
+  .trainer-reset-btn:hover { border-color:#6a5010; color:#d4a843; }
+
+  .trainer-area {
+    display:flex; flex-direction:column; align-items:center; gap:12px;
+    padding:14px; margin-bottom:14px; background:rgba(0,0,0,0.25);
+    border-radius:12px; border:1px solid #1a1a10;
+    min-height:200px; justify-content:center;
+  }
+  .trainer-section-label {
+    font-size:0.52rem; color:#4a6038; text-transform:uppercase;
+    letter-spacing:2px; text-align:center; margin-bottom:6px;
+  }
+  .trainer-hand-desc {
+    font-size:0.85rem; color:#a0b880; text-align:center;
+    margin-top:6px; letter-spacing:0.5px;
+  }
+  .trainer-vs-divider { color:#3a5028; font-size:0.65rem; letter-spacing:2px; }
+
+  .trainer-feedback {
+    text-align:center; padding:10px 16px; border-radius:8px;
+    margin-bottom:10px; font-size:0.85rem; font-weight:bold; letter-spacing:0.3px;
+  }
+  .trainer-feedback.correct { background:rgba(26,100,46,0.2); color:#6ddd6d; border:1px solid rgba(26,100,46,0.5); }
+  .trainer-feedback.incorrect { background:rgba(160,30,20,0.2); color:#ff7060; border:1px solid rgba(160,30,20,0.5); }
+
+  #trainer-next {
+    display:block; width:100%; margin-bottom:12px;
+    background:linear-gradient(160deg,#1e5a30,#144020);
+    color:#c0f0c0; border:1px solid #2a8040;
+    box-shadow:0 3px 0 #0a2810, 0 5px 12px rgba(0,0,0,0.4);
+    padding:10px; font-size:0.85rem; font-family:Georgia,serif;
+    font-weight:bold; letter-spacing:1.5px; border-radius:8px; cursor:pointer;
+    transition:all 0.1s;
+  }
+  #trainer-next:hover { filter:brightness(1.12); transform:translateY(-1px); }
+  #trainer-next:active { transform:translateY(1px); filter:brightness(0.95); }
+
+  /* Trainer action buttons */
+  .tbtn {
+    padding:9px 16px; font-size:0.82rem; font-family:Georgia,serif;
+    border:none; border-radius:8px; cursor:pointer; font-weight:bold;
+    letter-spacing:1px; transition:transform 0.1s, filter 0.1s;
+  }
+  .tbtn:hover:not(:disabled) { transform:translateY(-2px); filter:brightness(1.12); }
+  .tbtn:active:not(:disabled) { transform:translateY(1px); }
+  .tbtn:disabled { opacity:0.22; cursor:not-allowed; transform:none !important; filter:none !important; }
+  .tbtn-h { background:linear-gradient(160deg,#1e7a38,#145a28); color:#c8f0c8; box-shadow:0 3px 0 #0a3818; border:1px solid #2aaa50; }
+  .tbtn-s { background:linear-gradient(160deg,#8a1818,#6a0e0e); color:#ffc8c8; box-shadow:0 3px 0 #400808; border:1px solid #c03030; }
+  .tbtn-d { background:linear-gradient(160deg,#5a1878,#3e0e58); color:#e0c0ff; box-shadow:0 3px 0 #280840; border:1px solid #8a30c0; }
+  .tbtn-p { background:linear-gradient(160deg,#8a4a10,#6a3608); color:#ffd8a0; box-shadow:0 3px 0 #402008; border:1px solid #c07030; }
+  .tbtn-r { background:linear-gradient(160deg,#2a2a3a,#1a1a28); color:#9898b8; box-shadow:0 3px 0 #0a0a14; border:1px solid #4a4a6a; }
+
+  /* Detail stats */
+  .trainer-detail-wrap { margin-top:4px; }
+  .trainer-detail-title {
+    font-size:0.55rem; color:#3a4a28; text-transform:uppercase;
+    letter-spacing:1.5px; margin-bottom:6px; text-align:center;
+  }
+  .trainer-detail-list { max-height:160px; overflow-y:auto; scrollbar-width:thin; scrollbar-color:#2a2010 transparent; }
+  .trainer-detail-row {
+    display:flex; align-items:center; gap:8px;
+    padding:3px 2px; border-bottom:1px solid #0e0e08; font-size:0.68rem;
+  }
+  .trainer-detail-key { color:#6a8860; flex:1; }
+  .trainer-detail-score { color:#4a5a38; font-size:0.62rem; white-space:nowrap; min-width:32px; text-align:right; }
+  .trainer-detail-bar-wrap { width:50px; height:5px; background:#1a1a10; border-radius:3px; flex-shrink:0; }
+  .trainer-detail-bar-fill { height:100%; border-radius:3px; transition:width 0.3s; }
+
   .chart-table td.highlight-cell {
     outline: 2px solid #d4a843;
     outline-offset: -2px;
@@ -647,6 +740,7 @@
   <h1>Blackjack</h1>
   <div id="top-btns">
     <button class="top-icon-btn" onclick="openChart()">Strategy</button>
+    <button class="top-icon-btn" onclick="openTrainer()">Train</button>
     <button class="top-icon-btn" onclick="openSettings()">⚙</button>
   </div>
 </div>
@@ -729,6 +823,73 @@
 <div class="history" id="history"></div>
 <div class="keys-hint">D = Deal &nbsp;·&nbsp; H = Hit &nbsp;·&nbsp; S = Stand &nbsp;·&nbsp; X = Double &nbsp;·&nbsp; P = Split &nbsp;·&nbsp; U = Surrender</div>
 
+<!-- ═══════════════════════ TRAINER MODAL ════════════════════════ -->
+<div id="trainer-modal" class="modal" style="display:none" onclick="if(event.target===this)closeTrainer()">
+  <div class="modal-box" style="max-width:520px">
+    <div class="modal-title">Strategy Trainer</div>
+
+    <!-- Mode tabs -->
+    <div class="trainer-tabs">
+      <button class="trainer-tab active" id="tmode-hard"  onclick="setTrainerMode('hard')">Hard Totals</button>
+      <button class="trainer-tab"        id="tmode-soft"  onclick="setTrainerMode('soft')">Soft Totals</button>
+      <button class="trainer-tab"        id="tmode-pairs" onclick="setTrainerMode('pairs')">Pairs</button>
+      <button class="trainer-tab"        id="tmode-all"   onclick="setTrainerMode('all')">All</button>
+    </div>
+
+    <!-- Stats bar -->
+    <div class="trainer-stats-bar">
+      <div class="trainer-stat">
+        <span class="trainer-stat-label">Session</span>
+        <span class="trainer-stat-val" id="t-session">0 / 0</span>
+      </div>
+      <div class="trainer-stat">
+        <span class="trainer-stat-label">Streak</span>
+        <span class="trainer-stat-val trainer-streak-val" id="t-streak">0</span>
+      </div>
+      <div class="trainer-stat">
+        <span class="trainer-stat-label">Overall</span>
+        <span class="trainer-stat-val" id="t-overall">0 / 0</span>
+      </div>
+      <div class="trainer-stat">
+        <button class="trainer-reset-btn" onclick="resetTrainerOverall()">Reset All</button>
+      </div>
+    </div>
+
+    <!-- Training area: dealer + player cards -->
+    <div class="trainer-area" id="trainer-area">
+      <div>
+        <div class="trainer-section-label">Dealer shows</div>
+        <div class="cards" id="t-dealer-cards" style="justify-content:center;min-height:auto;gap:0"></div>
+      </div>
+      <div class="trainer-vs-divider">— your hand —</div>
+      <div>
+        <div class="cards" id="t-player-cards" style="justify-content:center;min-height:auto"></div>
+        <div id="t-hand-desc" class="trainer-hand-desc"></div>
+      </div>
+    </div>
+
+    <!-- Action buttons -->
+    <div class="buttons" id="t-action-btns">
+      <button class="tbtn tbtn-h" id="tbtn-hit"       onclick="trainerAction('H')">Hit</button>
+      <button class="tbtn tbtn-s" id="tbtn-stand"     onclick="trainerAction('S')">Stand</button>
+      <button class="tbtn tbtn-d" id="tbtn-double"    onclick="trainerAction('D')">Double</button>
+      <button class="tbtn tbtn-p" id="tbtn-split"     onclick="trainerAction('P')">Split</button>
+      <button class="tbtn tbtn-r" id="tbtn-surr"      onclick="trainerAction('R')" style="display:none">Surrender</button>
+    </div>
+
+    <!-- Feedback -->
+    <div id="t-feedback" class="trainer-feedback" style="display:none"></div>
+
+    <!-- Next -->
+    <button id="trainer-next" onclick="nextTrainerRound()" style="display:none">Next →</button>
+
+    <!-- Per-situation stats -->
+    <div class="trainer-detail-wrap" id="t-detail-stats"></div>
+
+    <button class="modal-close" onclick="closeTrainer()">Close</button>
+  </div>
+</div>
+
 <!-- ═══════════════════════ SETTINGS MODAL ═══════════════════════ -->
 <div id="settings-modal" class="modal" style="display:none" onclick="if(event.target===this)closeSettings()">
   <div class="modal-box">
@@ -786,10 +947,9 @@
   <div class="modal-box wide">
     <div class="modal-title">Basic Strategy Chart</div>
     <div class="chart-tabs">
-      <button class="chart-tab active" id="tab-hard"      onclick="showTab('hard')">Hard Totals</button>
-      <button class="chart-tab"        id="tab-soft"      onclick="showTab('soft')">Soft Totals</button>
-      <button class="chart-tab"        id="tab-pairs"     onclick="showTab('pairs')">Pairs</button>
-      <button class="chart-tab"        id="tab-surrender" onclick="showTab('surrender')">Surrender</button>
+      <button class="chart-tab active" id="tab-hard"  onclick="showTab('hard')">Hard Totals</button>
+      <button class="chart-tab"        id="tab-soft"  onclick="showTab('soft')">Soft Totals</button>
+      <button class="chart-tab"        id="tab-pairs" onclick="showTab('pairs')">Pairs</button>
     </div>
     <div class="chart-wrap" id="chart-content"></div>
     <div class="chart-legend">
@@ -1549,9 +1709,7 @@ function openChart() {
     const dealerUp = dealerHand[0];
     const isP = hand.length === 2 && isPair(hand);
     const isS = !isP && isSoft(hand);
-    const rec = getRecommendation(hand, dealerUp);
-    const isSurrRec = rec === 'R' || rec === 'Rh';
-    currentTab = isSurrRec ? 'surrender' : isP ? 'pairs' : isS ? 'soft' : 'hard';
+    currentTab = isP ? 'pairs' : isS ? 'soft' : 'hard';
     currentChartHand = hand;
     currentChartDealer = dealerUp;
   } else {
@@ -1565,7 +1723,7 @@ function closeChart() { document.getElementById('chart-modal').style.display = '
 
 function showTab(tab) {
   currentTab = tab;
-  ['hard','soft','pairs','surrender'].forEach(t => {
+  ['hard','soft','pairs'].forEach(t => {
     document.getElementById('tab-' + t).classList.toggle('active', t === tab);
   });
   renderChart(tab);
@@ -1577,30 +1735,25 @@ function renderChart(tab) {
 
   if (tab === 'hard') {
     rowLabels = ['5','6','7','8','9','10','11','12','13','14','15','16','17'];
-    rows = rowLabels.map(r => ({ label: r, data: HARD[parseInt(r)] }));
+    rows = rowLabels.map(r => {
+      const base = [...(HARD[parseInt(r)] || [])];
+      if (allowSurrender) {
+        const sKey = 'hard' + r;
+        if (SURRENDER[sKey]) base.forEach((_, i) => { if (SURRENDER[sKey][i] === 'R') base[i] = 'R'; });
+      }
+      return { label: r, data: base };
+    });
     title = 'Player Hard Total';
   } else if (tab === 'soft') {
     rowLabels = ['A,2','A,3','A,4','A,5','A,6','A,7','A,8','A,9'];
     const keys = ['A2','A3','A4','A5','A6','A7','A8','A9'];
     rows = rowLabels.map((r, i) => ({ label: r, data: SOFT[keys[i]] }));
     title = 'Player Soft Total';
-  } else if (tab === 'pairs') {
+  } else {
     rowLabels = ['2,2','3,3','4,4','5,5','6,6','7,7','8,8','9,9','10,10','A,A'];
     const keys = ['22','33','44','55','66','77','88','99','1010','AA'];
     rows = rowLabels.map((r, i) => ({ label: r, data: PAIRS[keys[i]] }));
     title = 'Player Pair';
-  } else {
-    // Surrender tab — rows depend on dealer rule
-    if (dealerHitsSoft17) {
-      rowLabels = ['Hard 17','Hard 16','Hard 15','8,8'];
-      const surKeys = ['hard17','hard16','hard15','pair88'];
-      rows = rowLabels.map((r, i) => ({ label: r, data: SURRENDER[surKeys[i]] }));
-    } else {
-      rowLabels = ['Hard 16','Hard 15'];
-      const surKeys = ['hard16','hard15'];
-      rows = rowLabels.map((r, i) => ({ label: r, data: SURRENDER[surKeys[i]] }));
-    }
-    title = 'Surrender';
   }
 
   let hRow = -1, hCol = -1;
@@ -1618,13 +1771,6 @@ function renderChart(tab) {
       const v = currentChartHand[0].value;
       const disp = ['J','Q','K','10'].includes(v) ? '10,10' : v+','+v;
       hRow = rowLabels.indexOf(disp);
-    } else if (tab === 'surrender' && currentChartHand.length === 2) {
-      const t = handValue(currentChartHand);
-      const isP88 = isPair(currentChartHand) && currentChartHand[0].value === '8';
-      if (isP88) hRow = rowLabels.indexOf('8,8');
-      else if (t === 17) hRow = rowLabels.indexOf('Hard 17');
-      else if (t === 16) hRow = rowLabels.indexOf('Hard 16');
-      else if (t === 15) hRow = rowLabels.indexOf('Hard 15');
     }
   }
 
@@ -1658,6 +1804,190 @@ document.addEventListener('keydown', e => {
   if (k === 'U' && !B('btn-surrender').disabled)  playerSurrender();
   if (k === 'ESCAPE') { closeSettings(); closeChart(); }
 });
+
+// ══════════════════════════════════════════════════════════════
+//  STRATEGY TRAINER
+// ══════════════════════════════════════════════════════════════
+let trainerMode = 'hard';
+let trainerHand = null, trainerDealer = null, trainerAnswered = false;
+let trainerSession = { correct: 0, total: 0, streak: 0, byKey: {} };
+
+function loadTrainerOverall() {
+  try { return JSON.parse(localStorage.getItem('bj-trainer-overall') || '{"correct":0,"total":0,"byKey":{}}'); }
+  catch { return { correct: 0, total: 0, byKey: {} }; }
+}
+function saveTrainerOverall(d) { localStorage.setItem('bj-trainer-overall', JSON.stringify(d)); }
+
+function openTrainer() {
+  trainerSession = { correct: 0, total: 0, streak: 0, byKey: {} };
+  document.getElementById('trainer-modal').style.display = 'flex';
+  setTrainerMode(trainerMode);
+}
+function closeTrainer() { document.getElementById('trainer-modal').style.display = 'none'; }
+
+function setTrainerMode(mode) {
+  trainerMode = mode;
+  ['hard','soft','pairs','all'].forEach(m =>
+    document.getElementById('tmode-' + m).classList.toggle('active', m === mode)
+  );
+  startTrainerRound();
+}
+
+// ── Hand generation ──────────────────────────────────────────
+function trainerMakeHardHand(total) {
+  const suits = ['♠','♥','♦','♣'], rs = () => suits[Math.floor(Math.random()*4)];
+  const combos = [];
+  for (let a = 2; a <= Math.min(total - 2, 10); a++) {
+    const b = total - a;
+    if (b >= 2 && b <= 10 && a !== b) combos.push([a, b]);
+  }
+  if (!combos.length) combos.push([2, total - 2]);
+  const [a, b] = combos[Math.floor(Math.random() * combos.length)];
+  const toV = n => n < 10 ? String(n) : ['10','J','Q','K'][Math.floor(Math.random()*4)];
+  return [{value: toV(a), suit: rs()}, {value: toV(b), suit: rs()}];
+}
+
+function pickTrainerHand() {
+  const suits = ['♠','♥','♦','♣'], rs = () => suits[Math.floor(Math.random()*4)];
+  const actualMode = trainerMode === 'all'
+    ? ['hard','soft','pairs'][Math.floor(Math.random()*3)] : trainerMode;
+  let hand;
+  if (actualMode === 'soft') {
+    const n = 2 + Math.floor(Math.random()*8);
+    hand = [{value:'A', suit:rs()}, {value:String(n), suit:rs()}];
+  } else if (actualMode === 'pairs') {
+    const pv = ['2','3','4','5','6','7','8','9','10','A'];
+    const v = pv[Math.floor(Math.random()*pv.length)];
+    const cv = v === '10' ? ['10','J','Q','K'][Math.floor(Math.random()*4)] : v;
+    hand = [{value:cv, suit:rs()}, {value:cv, suit:rs()}];
+  } else {
+    hand = trainerMakeHardHand(5 + Math.floor(Math.random()*13));
+  }
+  const dv = ['2','3','4','5','6','7','8','9','10','A'][Math.floor(Math.random()*10)];
+  const dc = dv === '10' ? ['10','J','Q','K'][Math.floor(Math.random()*4)] : dv;
+  return { hand, dealer: {value: dc, suit: rs()} };
+}
+
+// ── Round logic ──────────────────────────────────────────────
+function startTrainerRound() {
+  trainerAnswered = false;
+  const {hand, dealer} = pickTrainerHand();
+  trainerHand = hand; trainerDealer = dealer;
+
+  // Render cards
+  const pc = document.getElementById('t-player-cards');
+  const dc = document.getElementById('t-dealer-cards');
+  pc.innerHTML = ''; dc.innerHTML = '';
+  hand.forEach(c => pc.appendChild(makeCard(c)));
+  dc.appendChild(makeCard(dealer));
+  document.getElementById('t-hand-desc').textContent = getHandDescription(hand);
+
+  // Button visibility: pairs (except 5,5) show Split; non-pairs + 5,5 show Double
+  const isP = isPair(hand);
+  const is55 = isP && hand[0].value === '5';
+  document.getElementById('tbtn-split').style.display  = (isP && !is55) ? 'inline-block' : 'none';
+  document.getElementById('tbtn-double').style.display = (!isP || is55) ? 'inline-block' : 'none';
+
+  // Surrender button
+  let up = dealer.value;
+  if (['J','Q','K'].includes(up)) up = '10';
+  const di = DEALER_UPCARDS.indexOf(up);
+  document.getElementById('tbtn-surr').style.display =
+    (allowSurrender && getSurrenderRec(hand, di)) ? 'inline-block' : 'none';
+
+  // Enable buttons, hide feedback/next
+  document.querySelectorAll('#t-action-btns .tbtn').forEach(b => b.disabled = false);
+  document.getElementById('t-feedback').style.display = 'none';
+  document.getElementById('trainer-next').style.display = 'none';
+  updateTrainerStats();
+}
+
+function trainerAction(action) {
+  if (trainerAnswered) return;
+  trainerAnswered = true;
+
+  const isP = isPair(trainerHand);
+  const is55 = isP && trainerHand[0].value === '5';
+  const canDouble = !isP || is55;
+  const canSplit  = isP && !is55;
+  const rec = getRecommendation(trainerHand, trainerDealer);
+  const expected = normalizeRec(rec, trainerHand, canDouble, canSplit);
+  const correct = action === expected;
+
+  let up = trainerDealer.value;
+  if (['J','Q','K'].includes(up)) up = '10';
+  const key = getHandDescription(trainerHand) + ' vs ' + up;
+
+  // Session stats
+  trainerSession.total++;
+  if (correct) { trainerSession.correct++; trainerSession.streak++; }
+  else trainerSession.streak = 0;
+  if (!trainerSession.byKey[key]) trainerSession.byKey[key] = {c:0, t:0};
+  trainerSession.byKey[key].t++;
+  if (correct) trainerSession.byKey[key].c++;
+
+  // Overall stats (localStorage)
+  const ov = loadTrainerOverall();
+  ov.total++; if (correct) ov.correct++;
+  if (!ov.byKey) ov.byKey = {};
+  if (!ov.byKey[key]) ov.byKey[key] = {c:0, t:0};
+  ov.byKey[key].t++; if (correct) ov.byKey[key].c++;
+  saveTrainerOverall(ov);
+
+  // Feedback
+  const fb = document.getElementById('t-feedback');
+  if (correct) {
+    fb.textContent = '✓  ' + (ACTION_NAMES[action] || action) + ' — correct!';
+    fb.className = 'trainer-feedback correct';
+  } else {
+    fb.innerHTML = '✗  Should be: <strong>' + (ACTION_NAMES[expected] || expected) +
+      '</strong> &nbsp;·&nbsp; You chose: ' + (ACTION_NAMES[action] || action);
+    fb.className = 'trainer-feedback incorrect';
+  }
+  fb.style.display = 'block';
+
+  document.querySelectorAll('#t-action-btns .tbtn').forEach(b => b.disabled = true);
+  document.getElementById('trainer-next').style.display = 'block';
+  updateTrainerStats();
+  renderTrainerDetailStats();
+}
+
+function nextTrainerRound() { startTrainerRound(); }
+
+function updateTrainerStats() {
+  const {correct, total, streak} = trainerSession;
+  document.getElementById('t-session').textContent = correct + ' / ' + total;
+  document.getElementById('t-streak').textContent  = streak;
+  const ov = loadTrainerOverall();
+  document.getElementById('t-overall').textContent = ov.correct + ' / ' + ov.total;
+}
+
+function renderTrainerDetailStats() {
+  const el = document.getElementById('t-detail-stats');
+  const bk = trainerSession.byKey;
+  const keys = Object.keys(bk);
+  if (!keys.length) { el.innerHTML = ''; return; }
+  keys.sort((a, b) => (bk[a].c/bk[a].t) - (bk[b].c/bk[b].t));
+  let html = '<div class="trainer-detail-title">Session — worst first</div><div class="trainer-detail-list">';
+  keys.forEach(k => {
+    const {c, t} = bk[k];
+    const pct = Math.round(c / t * 100);
+    const barColor = pct < 60 ? '#c04030' : pct < 80 ? '#d4a843' : '#4ab860';
+    html += `<div class="trainer-detail-row">
+      <span class="trainer-detail-key">${k}</span>
+      <div class="trainer-detail-bar-wrap"><div class="trainer-detail-bar-fill" style="width:${pct}%;background:${barColor}"></div></div>
+      <span class="trainer-detail-score">${c}/${t}</span>
+    </div>`;
+  });
+  html += '</div>';
+  el.innerHTML = html;
+}
+
+function resetTrainerOverall() {
+  if (!confirm('Reset all overall stats?')) return;
+  saveTrainerOverall({correct:0, total:0, byKey:{}});
+  updateTrainerStats();
+}
 
 // ── Init ──────────────────────────────────────────────────────
 applyDealerRule();
